@@ -1,0 +1,32 @@
+[project]
+name = "ai-event-processing-platform"
+version = "0.1.0"
+description = "Production-grade AI-powered event processing platform"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "services/gateway",
+    "services/event-service",
+    "services/ai-service",
+    "services/analytics-service",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -11,5 +11,43 @@
         "statusBar.debuggingForeground": "#EFFEEF",
         "statusBar.noFolderBackground": "#032F03",
         "statusBar.noFolderForeground": "#EFFEEF"
-    }
+    },
+
+    // ── Python interpreter ────────────────────────────────────────────────────
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+
+    // ── Pylance / type checking ───────────────────────────────────────────────
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/services/gateway",
+        "${workspaceFolder}/services/event-service",
+        "${workspaceFolder}/services/ai-service",
+        "${workspaceFolder}/services/analytics-service"
+    ],
+
+    // ── Ruff: linter + formatter (replaces pylint, flake8, isort, black) ──────
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        }
+    },
+    "ruff.enable": true,
+    "ruff.lint.enable": true,
+    "ruff.format.enable": true,
+
+    // ── Disable conflicting linters ───────────────────────────────────────────
+    // Disable the ms-python.pylint extension for this workspace
+    "pylint.enabled": false,
+    // Legacy python.linting keys (no-op in newer extension, kept for safety)
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": false,
+    "python.linting.enabled": false,
+
+    // ── Tests ─────────────────────────────────────────────────────────────────
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+    "python.testing.pytestArgs": ["--tb=short"]
 }

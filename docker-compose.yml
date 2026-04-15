@@ -1,0 +1,72 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# AI Event Processing Platform – Local Dev Infrastructure
+#
+# Scope: Supplemental services only
+#   - Redis      → rate limiting + caching  (new)
+#   - Kafka UI   → topic / message browser  (new, dev profile)
+#
+# Already running externally (not managed here):
+#   - PostgreSQL  (your existing instance)
+#   - Kafka       (your existing instance)
+#
+# Usage:
+#   docker compose up -d                      # start Redis
+#   docker compose --profile dev up -d        # start Redis + Kafka UI
+#   docker compose down -v                    # stop + remove volumes
+#
+# Point Kafka UI at your existing Kafka by setting:
+#   KAFKA_HOST=<your-kafka-host>  (default: localhost)
+#   KAFKA_PORT=<your-kafka-port>  (default: 9092)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: platform-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD:-}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - platform-net
+
+  # ── Kafka UI (dev only – browse your existing Kafka topics) ─────────────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: platform-kafka-ui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "${KAFKA_HOST:-host.docker.internal}:${KAFKA_PORT:-9092}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # lets container reach host's Kafka
+    networks:
+      - platform-net
+    profiles:
+      - dev   # only starts with: docker compose --profile dev up -d
+
+# ── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  redis_data:
+
+# ── Network ───────────────────────────────────────────────────────────────────
+networks:
+  platform-net:
+    driver: bridge
+
+

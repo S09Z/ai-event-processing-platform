@@ -36,13 +36,21 @@ class AIKafkaWorker:
 
     async def start(self) -> None:
         """Start the Kafka consumer and producer."""
+
+        def _deserialize(v: bytes) -> dict | None:
+            try:
+                return json.loads(v.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                log.warning("ai_worker.invalid_message", raw=repr(v[:200]))
+                return None
+
         self._consumer = AIOKafkaConsumer(
             settings.KAFKA_EVENTS_TOPIC,
             bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
             group_id=settings.KAFKA_CONSUMER_GROUP,
             auto_offset_reset="earliest",
             enable_auto_commit=False,
-            value_deserializer=lambda v: json.loads(v.decode("utf-8")),
+            value_deserializer=_deserialize,
         )
         self._producer = AIOKafkaProducer(
             bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
@@ -69,6 +77,10 @@ class AIKafkaWorker:
 
         async for msg in self._consumer:
             event_data = msg.value
+            if event_data is None:
+                # Non-JSON message (e.g. smoke-test bytes) – skip and commit
+                await self._consumer.commit()
+                continue
             await self._process_with_retry(event_data)
             await self._consumer.commit()
 

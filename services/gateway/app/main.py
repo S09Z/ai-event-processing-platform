@@ -31,12 +31,35 @@ structlog.configure(
 log: structlog.BoundLogger = structlog.get_logger()
 
 
+_TAGS_METADATA = [
+    {
+        "name": "health",
+        "description": "Liveness and readiness probes.",
+    },
+]
+
+
 def create_app() -> FastAPI:
     """Create and configure the FastAPI gateway application."""
+    _docs = settings.APP_ENV != "production"
     app = FastAPI(
         title="AI Event Platform – Gateway",
+        summary="API Gateway: authentication, rate-limiting, and request routing.",
+        description=(
+            "The **Gateway** is the single entry-point for all client traffic.\n\n"
+            "It enforces:\n"
+            "- JWT / API-Key **authentication**\n"
+            "- Redis-backed **rate limiting** (`X-RateLimit-*` headers)\n"
+            "- Propagation of `X-Correlation-ID` for distributed tracing\n\n"
+            "Swagger UI: `/docs` · ReDoc: `/redoc` · OpenAPI JSON: `/openapi.json`"
+        ),
         version="1.0.0",
-        docs_url="/docs" if settings.APP_ENV != "production" else None,
+        contact={"name": "Platform Team", "email": "platform@example.com"},
+        license_info={"name": "MIT"},
+        openapi_tags=_TAGS_METADATA,
+        docs_url="/docs" if _docs else None,
+        redoc_url="/redoc" if _docs else None,
+        openapi_url="/openapi.json" if _docs else None,
     )
 
     # Middleware (order matters – outermost runs first)

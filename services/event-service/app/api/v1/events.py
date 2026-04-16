@@ -44,6 +44,17 @@ def get_event_service(
     response_model=EventResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new event",
+    description=(
+        "Ingest a new event.\n\n"
+        "- Validates and persists the event to **PostgreSQL**\n"
+        "- Publishes the event to the **Kafka** `events` topic\n"
+        "- Returns the created event with its assigned `id` and `status`"
+    ),
+    operation_id="create_event",
+    responses={
+        201: {"description": "Event created successfully"},
+        422: {"description": "Validation error – check request body"},
+    },
 )
 async def create_event(
     body: CreateEventRequest,
@@ -65,6 +76,12 @@ async def create_event(
     "/{event_id}",
     response_model=EventResponse,
     summary="Get event by ID",
+    description="Retrieve a single event by its UUID. Returns 404 if not found.",
+    operation_id="get_event",
+    responses={
+        200: {"description": "Event found"},
+        404: {"description": "Event not found"},
+    },
 )
 async def get_event(
     event_id: str,
@@ -91,6 +108,15 @@ async def get_event(
     "/",
     response_model=EventListResponse,
     summary="List events",
+    description=(
+        "Return a paginated list of events.\n\n"
+        "Use `limit` (max items per page, default 50) and `offset` "
+        "(number of items to skip, default 0) for pagination."
+    ),
+    operation_id="list_events",
+    responses={
+        200: {"description": "Paginated list of events"},
+    },
 )
 async def list_events(
     limit: int = 50,

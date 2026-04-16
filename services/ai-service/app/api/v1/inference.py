@@ -26,6 +26,17 @@ def get_inference_service() -> InferenceService:
     response_model=PredictionResponse,
     status_code=status.HTTP_200_OK,
     summary="Run AI inference on an event",
+    description=(
+        "Submit an event payload for synchronous ML inference.\n\n"
+        "The model classifies the event and returns a `label` with a confidence `score`.\n\n"
+        "*Note:* High-throughput workloads should use the async Kafka pipeline instead."
+    ),
+    operation_id="infer",
+    responses={
+        200: {"description": "Inference result returned successfully"},
+        422: {"description": "Validation error – check request body"},
+        500: {"description": "Inference failed – see logs for details"},
+    },
 )
 async def infer(
     body: InferenceRequest,

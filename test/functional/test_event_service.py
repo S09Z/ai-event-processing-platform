@@ -44,7 +44,9 @@ class TestCreateEvent:
         expected = Event(type="click", payload={"button": "submit"})
         mock_repo.save.return_value = expected
 
-        result = await service.create_event({"type": "click", "payload": {"button": "submit"}})
+        result = await service.create_event(
+            {"type": "click", "payload": {"button": "submit"}}
+        )
 
         assert result.type == "click"
         assert result.status == EventStatus.PENDING

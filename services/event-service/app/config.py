@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://app_user:changeme@localhost:5432/events_db"
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://app_user:changeme@localhost:5432/events_db"
+    )
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"

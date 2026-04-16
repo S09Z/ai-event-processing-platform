@@ -2,7 +2,7 @@
 
 ## Workflow
 
-```
+```text
 Client
   │
   ▼
@@ -46,20 +46,20 @@ Client
 
 ### Async vs Sync inference
 
-| Path | Description |
-|------|-------------|
-| **Async** (default) | Client posts to Event Service → Kafka → AI Worker processes in background |
-| **Sync** | Client posts directly to `POST /api/v1/ai/infer` on AI Service |
+| Path                | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| **Async** (default) | Client posts to Event Service → Kafka → AI Worker processes in background   |
+| **Sync**            | Client posts directly to `POST /api/v1/ai/infer` on AI Service              |
 
 ### Infrastructure
 
-| Service | Role |
-|---------|------|
-| PostgreSQL | Event persistence |
-| Redis | Rate-limit counters, caching |
-| Kafka | Event streaming between services |
-| Prometheus | Metrics scraping |
-| OpenTelemetry | Distributed tracing (Correlation ID) |
+| Service        | Role                                        |
+| -------------- | ------------------------------------------- |
+| PostgreSQL     | Event persistence                           |
+| Redis          | Rate-limit counters, caching                |
+| Kafka          | Event streaming between services            |
+| Prometheus     | Metrics scraping                            |
+| OpenTelemetry  | Distributed tracing (Correlation ID)        |
 
 ### Running locally
 
@@ -71,18 +71,18 @@ docker compose --profile dev up -d
 uv sync
 
 # 3. Start services (each in a separate terminal, from repo root)
-PYTHONPATH=services/gateway      uv run python -m uvicorn app.main:app --port 8000 --reload
+PYTHONPATH=services/gateway       uv run python -m uvicorn app.main:app --port 8000 --reload
 PYTHONPATH=services/event-service uv run python -m uvicorn app.main:app --port 8001 --reload
 PYTHONPATH=services/ai-service    uv run python -m uvicorn app.main:app --port 8002 --reload
 ```
 
 ### API Docs (development only)
 
-| Service | Swagger UI | ReDoc |
-|---------|-----------|-------|
-| Gateway | http://localhost:8000/docs | http://localhost:8000/redoc |
-| Event Service | http://localhost:8001/docs | http://localhost:8001/redoc |
-| AI Service | http://localhost:8002/docs | http://localhost:8002/redoc |
+| Service       | Swagger UI                              | ReDoc                                  |
+| ------------- | --------------------------------------- | -------------------------------------- |
+| Gateway       | <http://localhost:8000/docs>            | <http://localhost:8000/redoc>          |
+| Event Service | <http://localhost:8001/docs>            | <http://localhost:8001/redoc>          |
+| AI Service    | <http://localhost:8002/docs>            | <http://localhost:8002/redoc>          |
 
 ### Running tests
 
